@@ -4,7 +4,7 @@ import (
 	"context"
 
 	openai "github.com/sashabaranov/go-openai"
-	"github.com/sashabaranov/go-openai/internal/test/checks"
+	"github.com/whybeyoung/go-openai/internal/test/checks"
 
 	"encoding/json"
 	"fmt"

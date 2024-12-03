@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/sashabaranov/go-openai/internal/test/checks"
 	"github.com/sashabaranov/go-openai/jsonschema"
+	"github.com/whybeyoung/go-openai/internal/test/checks"
 )
 
 func TestAPI(t *testing.T) {

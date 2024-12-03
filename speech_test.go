@@ -12,8 +12,8 @@ import (
 	"testing"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/sashabaranov/go-openai/internal/test"
-	"github.com/sashabaranov/go-openai/internal/test/checks"
+	"github.com/whybeyoung/go-openai/internal/test"
+	"github.com/whybeyoung/go-openai/internal/test/checks"
 )
 
 func TestSpeechIntegration(t *testing.T) {

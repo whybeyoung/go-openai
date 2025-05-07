@@ -399,7 +399,7 @@ func (c *Client) CreateChatCompletion(
 		ctx,
 		http.MethodPost,
 		c.fullURL(urlSuffix, withModel(request.Model)),
-		withBody(request), withBody(request.ExtraBody),
+		withBody(request), withExtraBody(request.ExtraBody),
 	)
 	if err != nil {
 		return

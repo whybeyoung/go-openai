@@ -4,16 +4,28 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/whybeyoung/go-openai"
 )
 
 func main() {
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
+	config := openai.DefaultConfig("sk-Kj7yJbMsBJXWIUxBD1C5B7446bD34a99912702662eB31131")
+	config.BaseURL = "http://maas-api.cn-huabei-1.xf-yun.com/v1"
+	config.HTTPClient = &http.Client{
+		Timeout: 2 * time.Minute,
+		Transport: &http.Transport{
+			MaxIdleConns:        100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout:     90 * time.Second,
+		},
+	}
+	client := openai.NewClientWithConfig(config)
 
 	req := openai.ChatCompletionRequest{
-		Model: openai.GPT3Dot5Turbo,
+		Model: "xdeepseekv3",
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
@@ -21,6 +33,8 @@ func main() {
 			},
 		},
 	}
+	req.ExtraBody = make(map[string]any)
+	req.ExtraBody["bootstrap_room"] = 1
 	fmt.Println("Conversation")
 	fmt.Println("---------------------")
 	fmt.Print("> ")

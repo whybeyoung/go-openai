@@ -85,18 +85,28 @@ func withBody(body any) requestOption {
 }
 func withExtraBody(extraBody map[string]any) requestOption {
 	return func(args *requestOptions) {
-		// Initialize args.body as a map[string]any if it's nil.
+		// If body is nil, create a new map
 		if args.body == nil {
 			args.body = make(map[string]any)
 		}
-		// Assert that args.body is a map[string]any.
+
+		// Convert body to map[string]any
 		bodyMap, ok := args.body.(map[string]any)
 		if !ok {
-			// If it's not, initialize it as a map[string]any.
-			bodyMap = make(map[string]any)
-			args.body = bodyMap
+			// If it's not a map, try to convert the struct to map
+			jsonBytes, err := json.Marshal(args.body)
+			if err != nil {
+				// If marshal fails, create a new map
+				bodyMap = make(map[string]any)
+			} else {
+				// Unmarshal into map
+				if err := json.Unmarshal(jsonBytes, &bodyMap); err != nil {
+					bodyMap = make(map[string]any)
+				}
+			}
 		}
-		// Add extraBody fields to args.body.
+
+		// Merge extraBody into bodyMap
 		for key, value := range extraBody {
 			bodyMap[key] = value
 		}

@@ -13,7 +13,9 @@ import (
 
 func main() {
 	config := openai.DefaultConfig("sk-Kj7yJbMsBJXWIUxBD1C5B7446bD34a99912702662eB31131")
-	config.BaseURL = "http://maas-api.cn-huabei-1.xf-yun.com/v1"
+	//config.BaseURL = "http://maas-api.cn-huabei-1.xf-yun.com/v1"
+	config.BaseURL = "http://36.138.165.10:30822/v1"
+
 	config.HTTPClient = &http.Client{
 		Timeout: 2 * time.Minute,
 		Transport: &http.Transport{
@@ -32,10 +34,15 @@ func main() {
 				Content: "you are a helpful chatbot",
 			},
 		},
+		ExtraBody: map[string]interface{}{
+			"bootstrap_host": "0.0.0.1",
+			"bootstrap_port": 23,
+			"bootstrap_room": 1111,
+			"prefill_addr":   "0.0.0.1",
+		},
 	}
+
 	req.TopP = 0.1
-	req.ExtraBody = make(map[string]any)
-	req.ExtraBody["bootstrap_room"] = 1
 	fmt.Println("Conversation")
 	fmt.Println("---------------------")
 	fmt.Print("> ")

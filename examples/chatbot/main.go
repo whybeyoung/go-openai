@@ -33,6 +33,7 @@ func main() {
 			},
 		},
 	}
+	req.TopP = 0.1
 	req.ExtraBody = make(map[string]any)
 	req.ExtraBody["bootstrap_room"] = 1
 	fmt.Println("Conversation")

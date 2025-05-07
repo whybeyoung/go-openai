@@ -86,31 +86,33 @@ func withBody(body any) requestOption {
 
 func withExtraBody(extraBody map[string]any) requestOption {
 	return func(args *requestOptions) {
-		// If body is nil, create a new map
+		// First convert body to map if it's not already
+		var bodyMap map[string]any
 		if args.body == nil {
-			args.body = make(map[string]any)
-		}
-
-		// If body is not a map, convert it to map
-		if _, ok := args.body.(map[string]any); !ok {
+			bodyMap = make(map[string]any)
+		} else if m, ok := args.body.(map[string]any); ok {
+			bodyMap = m
+		} else {
 			jsonBytes, err := json.Marshal(args.body)
 			if err != nil {
-				args.body = make(map[string]any)
+				bodyMap = make(map[string]any)
 			} else {
-				var m map[string]any
-				if err := json.Unmarshal(jsonBytes, &m); err != nil {
-					args.body = make(map[string]any)
-				} else {
-					args.body = m
+				if err := json.Unmarshal(jsonBytes, &bodyMap); err != nil {
+					bodyMap = make(map[string]any)
 				}
 			}
 		}
 
-		// Now args.body is definitely a map, add extraBody fields directly to it
-		bodyMap := args.body.(map[string]any)
+		// Remove extra_body field if it exists
+		delete(bodyMap, "extra_body")
+
+		// Add all fields from extraBody
 		for key, value := range extraBody {
 			bodyMap[key] = value
 		}
+
+		// Update args.body with the new map
+		args.body = bodyMap
 	}
 }
 
@@ -135,6 +137,7 @@ func (c *Client) newRequest(ctx context.Context, method, url string, setters ...
 	for _, setter := range setters {
 		setter(args)
 	}
+	fmt.Println(args.body)
 	req, err := c.requestBuilder.Build(ctx, method, url, args.body, args.header)
 	if err != nil {
 		return nil, err

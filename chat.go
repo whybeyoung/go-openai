@@ -259,7 +259,8 @@ type ChatCompletionRequest struct {
 	// https://platform.openai.com/docs/api-reference/chat/create#chat-create-store
 	Store bool `json:"store,omitempty"`
 	// Metadata to store with the completion.
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Metadata  map[string]string `json:"metadata,omitempty"`
+	ExtraBody map[string]any    `json:"extra_body,omitempty"`
 }
 
 type StreamOptions struct {
@@ -398,7 +399,7 @@ func (c *Client) CreateChatCompletion(
 		ctx,
 		http.MethodPost,
 		c.fullURL(urlSuffix, withModel(request.Model)),
-		withBody(request),
+		withBody(request), withBody(request.ExtraBody),
 	)
 	if err != nil {
 		return

@@ -271,6 +271,8 @@ type CompletionRequest struct {
 	Temperature     float32           `json:"temperature,omitempty"`
 	TopP            float32           `json:"top_p,omitempty"`
 	User            string            `json:"user,omitempty"`
+
+	ExtraBody map[string]any `json:"extra_body,omitempty"`
 }
 
 // CompletionChoice represents one of possible completions.
@@ -330,7 +332,7 @@ func (c *Client) CreateCompletion(
 		ctx,
 		http.MethodPost,
 		c.fullURL(urlSuffix, withModel(request.Model)),
-		withBody(request),
+		withBody(request), withExtraBody(request.ExtraBody),
 	)
 	if err != nil {
 		return

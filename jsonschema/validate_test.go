@@ -3,7 +3,7 @@ package jsonschema_test
 import (
 	"testing"
 
-	"github.com/AyushSawant18588/go-openai/jsonschema"
+	"github.com/whybeyoung/go-openai/jsonschema"
 )
 
 func Test_Validate(t *testing.T) {

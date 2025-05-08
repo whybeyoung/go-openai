@@ -137,7 +137,6 @@ func (c *Client) newRequest(ctx context.Context, method, url string, setters ...
 	for _, setter := range setters {
 		setter(args)
 	}
-	fmt.Println(args.body)
 	req, err := c.requestBuilder.Build(ctx, method, url, args.body, args.header)
 	if err != nil {
 		return nil, err

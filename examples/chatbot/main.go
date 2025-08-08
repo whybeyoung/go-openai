@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/whybeyoung/go-openai"
@@ -30,8 +29,8 @@ func main() {
 		Model: "xdeepseekv3",
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: "you are a helpful chatbot",
+				Role:    openai.ChatMessageRoleUser,
+				Content: "you are a helpful chatbot 你是谁",
 			},
 		},
 		ExtraBody: map[string]interface{}{
@@ -39,26 +38,55 @@ func main() {
 			"bootstrap_port": 23,
 			"bootstrap_room": 1111,
 			"prefill_addr":   "0.0.0.1",
+			"session_params": map[string]interface{}{
+				"rid": "mgn00010282@dx196c8dc6f88ba44182",
+			},
 		},
 	}
-
-	req.TopP = 0.1
-	fmt.Println("Conversation")
-	fmt.Println("---------------------")
-	fmt.Print("> ")
-	s := bufio.NewScanner(os.Stdin)
-	for s.Scan() {
-		req.Messages = append(req.Messages, openai.ChatCompletionMessage{
-			Role:    openai.ChatMessageRoleUser,
-			Content: s.Text(),
-		})
-		resp, err := client.CreateChatCompletion(context.Background(), req)
-		if err != nil {
-			fmt.Printf("ChatCompletion error: %v\n", err)
-			continue
-		}
-		fmt.Printf("%s\n\n", resp.Choices[0].Message.Content)
-		req.Messages = append(req.Messages, resp.Choices[0].Message)
-		fmt.Print("> ")
+	stream, err := client.CreateChatCompletionStream(context.Background(), req)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
 	}
+	defer stream.Close()
+	for {
+		select {
+		case <-ctx.Done():
+			if ctx.Err() == context.DeadlineExceeded {
+			}
+			return
+		default:
+		}
+		response, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return
+		}
+		if len(response.Choices) > 0 && response.Choices[0].Delta.Content != "" {
+			fmt.Println(response.Choices[0].Delta.Content)
+		}
+	}
+	//req.TopP = 0.1
+	//fmt.Println("Conversation")
+	//fmt.Println("---------------------")
+	//fmt.Print("> ")
+	//s := bufio.NewScanner(os.Stdin)
+	//for s.Scan() {
+	//	req.Messages = append(req.Messages, openai.ChatCompletionMessage{
+	//		Role:    openai.ChatMessageRoleUser,
+	//		Content: s.Text(),
+	//	})
+	//	resp, err := client.CreateChatCompletion(context.Background(), req)
+	//	if err != nil {
+	//		fmt.Printf("ChatCompletion error: %v\n", err)
+	//		continue
+	//	}
+	//	fmt.Printf("%s\n\n", resp.Choices[0].Message.Content)
+	//	req.Messages = append(req.Messages, resp.Choices[0].Message)
+	//	fmt.Print("> ")
+	//}
 }

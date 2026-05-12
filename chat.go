@@ -195,7 +195,7 @@ type ToolCall struct {
 }
 
 type FunctionCall struct {
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 	// call function with arguments in JSON format
 	Arguments string `json:"arguments,omitempty"`
 }
